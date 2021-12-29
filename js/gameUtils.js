@@ -24,35 +24,70 @@ const compChoise = (fills, winSchemas, symbol, line, lineClassSchema) => {
   }
 
   const counts = [
-    { schemaIndex: 0, val: 0, busyPlayerFills: [], busyCompFills: [] },
-    { schemaIndex: 1, val: 0, busyPlayerFills: [], busyCompFills: [] },
-    { schemaIndex: 2, val: 0, busyPlayerFills: [], busyCompFills: [] },
-    { schemaIndex: 3, val: 0, busyPlayerFills: [], busyCompFills: [] },
-    { schemaIndex: 4, val: 0, busyPlayerFills: [], busyCompFills: [] },
-    { schemaIndex: 5, val: 0, busyPlayerFills: [], busyCompFills: [] },
-    { schemaIndex: 6, val: 0, busyPlayerFills: [], busyCompFills: [] },
-    { schemaIndex: 7, val: 0, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 0, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 1, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 2, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 3, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 4, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 5, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 6, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 7, busyPlayerFills: [], busyCompFills: [] },
   ];
 
   winSchemas.forEach((shema, index) => {
     shema.forEach((item) => {
       if (fills[item].innerHTML === symbol) {
-        counts[index].val = counts[index].val + 1;
         counts[index].busyPlayerFills = [
           ...counts[index].busyPlayerFills,
           item,
         ];
       }
+
+      if (fills[item].innerHTML === compSymbol) {
+        counts[index].busyCompFills = [...counts[index].busyCompFills, item];
+      }
     });
   });
 
-  const max = counts.reduce((acc, curr) => (acc.val > curr.val ? acc : curr));
-
-  console.log(max);
-
-  const emptyFromMax = winSchemas[max.schemaIndex].filter(
-    (a) => max.busyPlayerFills.indexOf(a) == -1
+  const maxPlayer = counts.reduce((acc, curr) =>
+    acc.busyPlayerFills.length > curr.busyPlayerFills.length ? acc : curr
   );
+
+  const compLengths = counts.map(({ busyCompFills }) => busyCompFills.length);
+
+  const maxCompLength = Math.max.apply(null, compLengths);
+
+  const maxCompArray = counts.filter(({ busyCompFills }) => {
+    console.log(busyCompFills);
+    return busyCompFills.length === maxCompLength;
+  });
+
+  const playerLengths = maxCompArray.map(
+    ({ busyPlayerFills }) => busyPlayerFills.length
+  );
+  const minPlayerLength = Math.min.apply(null, playerLengths);
+
+  const maxComp = maxCompArray.find(
+    ({ busyPlayerFills }) => busyPlayerFills.length === minPlayerLength
+  );
+
+  const schema =
+    maxPlayer.busyPlayerFills.length > maxComp.busyCompFills.length
+      ? maxPlayer
+      : maxComp;
+
+  const array =
+    maxPlayer.busyPlayerFills.length > maxComp.busyCompFills.length
+      ? maxPlayer.busyPlayerFills
+      : maxComp.busyCompFills;
+
+  const emptyFromMax = winSchemas[schema.schemaIndex].filter(
+    (a) => array.indexOf(a) == -1
+  );
+
+  console.log(schema);
+
+  console.log(emptyFromMax);
 
   const randomField = emptyFills[getRandomInt(0, emptyFills.length)];
 
