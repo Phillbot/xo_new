@@ -15,15 +15,57 @@ const getEmptyFills = (fills) => {
 const compChoise = (fills, winSchemas, symbol, line, lineClassSchema) => {
   const emptyFills = getEmptyFills(fills);
 
-  //here we can change logic of programm - find player in chemas
-  //and push in index where win its more really
+  const compSymbol = symbol === "X" ? "O" : "X";
+
+  if (compSymbol === "X" && emptyFills.length === fills.length) {
+    fills[4].innerHTML = "X";
+    setColor(fills);
+    return;
+  }
+
+  const counts = [
+    { schemaIndex: 0, val: 0, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 1, val: 0, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 2, val: 0, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 3, val: 0, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 4, val: 0, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 5, val: 0, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 6, val: 0, busyPlayerFills: [], busyCompFills: [] },
+    { schemaIndex: 7, val: 0, busyPlayerFills: [], busyCompFills: [] },
+  ];
+
+  winSchemas.forEach((shema, index) => {
+    shema.forEach((item) => {
+      if (fills[item].innerHTML === symbol) {
+        counts[index].val = counts[index].val + 1;
+        counts[index].busyPlayerFills = [
+          ...counts[index].busyPlayerFills,
+          item,
+        ];
+      }
+    });
+  });
+
+  const max = counts.reduce((acc, curr) => (acc.val > curr.val ? acc : curr));
+
+  console.log(max);
+
+  const emptyFromMax = winSchemas[max.schemaIndex].filter(
+    (a) => max.busyPlayerFills.indexOf(a) == -1
+  );
 
   const randomField = emptyFills[getRandomInt(0, emptyFills.length)];
 
-  if (randomField) {
-    randomField.innerHTML = symbol === "X" ? "O" : "X";
+  if (!fills[emptyFromMax[emptyFromMax.length - 1]].innerHTML) {
+    fills[emptyFromMax[emptyFromMax.length - 1]].innerHTML = compSymbol;
     setColor(fills);
     checkWin(fills, winSchemas, symbol, line, lineClassSchema);
+  } else {
+    if (randomField) {
+      randomField.innerHTML = compSymbol;
+      setColor(fills);
+      checkWin(fills, winSchemas, symbol, line, lineClassSchema);
+    }
   }
 };
 
